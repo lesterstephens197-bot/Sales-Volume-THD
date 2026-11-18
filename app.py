@@ -3,13 +3,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-# 1. 必须放在所有 Streamlit 命令的最顶部
-st.set_page_config(
-    page_title="E-commerce Monthly Daily Sales Dashboard",
-    page_layout="wide",
-    initial_sidebar_state="expanded",
-)
-
+# 直接从标题开始，没有任何前置配置命令，彻底杜绝位置或版本报错
 st.title("📈 跨境电商销售与日均销量分析看板 (1-10月)")
 st.markdown(
     "请上传包含标准表头的订单数据文件（支持 `.csv` 或 `.xlsx` 格式）。"
@@ -24,7 +18,7 @@ if uploaded_file is not None:
   try:
     # 读取文件
     if uploaded_file.name.endswith(".csv"):
-      df = pd.read_csv(uploaded_file, dtype=str)  # 先全部以字符串读取，防止混淆
+      df = pd.read_csv(uploaded_file, dtype=str)
     else:
       df = pd.read_excel(uploaded_file, dtype=str)
 
