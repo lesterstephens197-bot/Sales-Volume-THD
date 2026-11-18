@@ -1,8 +1,9 @@
+import calendar
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-# 页面配置
+# 【必须在最顶部且是第一个 Streamlit 命令】
 st.set_page_config(
     page_title="E-commerce Monthly Daily Sales Dashboard",
     page_layout="wide",
@@ -38,10 +39,10 @@ if uploaded_file is not None:
     else:
       # 数据预处理
       df["Order Date"] = pd.to_datetime(df["Order Date"], errors="coerce")
-      df["Quantity"] = pd.to_numeric(df["Quantity"], errors="fillna").fillna(0)
+      df["Quantity"] = pd.to_numeric(df["Quantity"], errors="coerce").fillna(0)
       if "Total Cost" in df.columns:
         df["Total Cost"] = pd.to_numeric(
-            df["Total Cost"], errors="fillna"
+            df["Total Cost"], errors="coerce"
         ).fillna(0)
 
       # 提取年份和月份
@@ -88,7 +89,6 @@ if uploaded_file is not None:
             df_year = df_year[df_year["运营"] == selected_op]
 
         # --- 核心计算：按月汇总销量及日均销量 ---
-        # 计算每个月总销量、总金额、以及当月天数
         monthly_summary = (
             df_year.groupby("Month")
             .agg(
@@ -104,10 +104,7 @@ if uploaded_file is not None:
             .reset_index()
         )
 
-        # 计算每月天数（基于当年各月的实际天数，或用当前年份计算）
-        # 构造一个代表该年各月天数的字典
-        import calendar
-
+        # 计算每月天数
         days_in_month = {
             m: calendar.monthrange(int(selected_year), m)[1] for m in range(1, 11)
         }
@@ -143,9 +140,6 @@ if uploaded_file is not None:
 
         total_qty_sum = monthly_summary["Total_Qty"].sum()
         total_amt_sum = monthly_summary["Total_Amount"].sum()
-        overall_daily_avg = total_qty_sum / (
-            304 if int(selected_year) % 4 != 0 else 305
-        )  # 1-10月总天数约304天
 
         col1.metric("1-10月累计总销量", f"{total_qty_sum:,.0f} 件")
         if "Total Cost" in df.columns:
